@@ -1,0 +1,182 @@
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <chrono>
+#include <ctime>
+
+using namespace std;
+
+void printline(){
+    cout<<":::|------------------------------------------------------------------|:::"<<endl;
+}
+
+class Menu{
+public:
+    string order_no;
+    int choice,quantity,cus_no=1;
+    void veg(){
+        printline();
+        cout<<"\t\t\t\tVeg Dishes"<<endl;
+        printline();
+        cout<<"\n1.Sambar - Rs.50\n2.Rasam - Rs.40\n3.Pongal - Rs.30\n4.Vegetable Biriyani - Rs.70\n5.Cancel\nEnter your choice : ";
+
+        if(cin>>choice){
+            try{
+                if(choice>=1 && choice<=5){
+                    if(choice!=5){
+                        cout<<"Enter the quantity : ";
+                        cin>>quantity;
+                    }
+                    switch(choice){
+                    case 1:
+                        place_order("Veg","Sambar",50);
+                        break;
+                    case 2:
+                        place_order("Veg","Rasam",40);
+                        break;
+                    case 3:
+                        place_order("Veg","Pongal",30);
+                        break;
+                    case 4:
+                        place_order("Veg","Vegetable Biriyani",70);
+                        break;
+                    case 5:
+                        cout<<"";
+                        return;
+                        break;
+                    default:
+                        cout<<"Please! Enter correct option...";
+                        break;
+                    }
+                }else{
+                    throw choice;
+                }
+            }catch(int choice){
+                cout<<choice<<" isn't a valid operation! Enter correct operation!...\n"<<endl;
+                veg();
+            }
+        }else{
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout<<"Invalid input! Please enter a number.\n"<< endl;
+            veg();
+        }
+    }
+
+    void non_veg(){
+        printline();
+        cout<<"\t\t\t\tNon-veg Dishes"<<endl;
+        printline();
+        cout<<"\n1.Chicken65 250g - Rs.80\n2.Muttan Biriyani - Rs.90\n3.Chicken Biriyani - Rs.70\n4.Cancel\nEnter your choice : ";
+
+        if(cin>>choice){
+            try{
+                if(choice>=1 && choice<=4){
+                    if(choice!=5){
+                        cout<<"Enter the quantity : ";
+                        cin>>quantity;
+                    }
+                    switch(choice){
+                    case 1:
+                        place_order("Non-Veg","Chicken65 250g",80);
+                        break;
+                    case 2:
+                        place_order("Non-Veg","Muttan Biriyani",90);
+                        break;
+                    case 3:
+                        place_order("Non-Veg","Chicken Biriyani",70);
+                        break;
+                    case 4:
+                        return;
+                        break;
+                    default:
+                        cout<<"Please! Enter correct option...";
+                        break;
+                    }
+                }else{
+                    throw choice;
+                }
+            }catch(int choice){
+                cout<<choice<<" isn't a valid operation! Enter correct operation!...\n"<<endl;
+                non_veg();
+            }
+        }else{
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout<<"Invalid input! Please enter a number.\n"<< endl;
+            non_veg();
+        }
+    }
+
+    void place_order(string f_type,string food,int price){
+        stringstream str;
+        str<<cus_no++;
+        str>>order_no;
+        string file = "Bills/Bill_no"+order_no+".txt";
+
+        ofstream bill(file);
+        fstream history("History/history.txt",ios::app);
+
+        auto currentTimePoint = chrono::system_clock::now();
+        time_t currentTime = chrono::system_clock::to_time_t(currentTimePoint);
+
+        tm* timeStruct = localtime(&currentTime);
+        char timeString[100];
+        strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", timeStruct);
+
+        bill<<"\t-----\tThank you!\t-----\nCustomer No : "<<order_no<<"\nFood type : "<<f_type<<"\nFood : "<<food<<"\nQuantity : "<<quantity<<"\nPrice : Rs."<<price*quantity<<endl;
+        history<<"\nCustomer number : "<<order_no<<"\nDate and time of order : "<<timeString<<endl;
+
+        bill.close();
+        history.close();
+
+        greet();
+    }
+
+    void greet(){
+        cout<<"\t\t\tThank you!\n\t\tOrder placed successfully!..."<<endl;
+    }
+};
+
+int main()
+{
+    Menu M;
+    int ch;
+    do{
+        printline();
+        cout<<"\t\t\t\tWELCOME!..."<<endl;
+        printline();
+        cout<<"\t\t\t\tM E N U"<<endl;
+        printline();
+        cout<<"\n1.Veg\n2.Non-Veg\nEnter your choice : ";
+        if(cin>>ch){
+            try{
+                if(ch >= 1 && ch <= 2) {
+                    switch (ch) {
+                    case 1:
+                        M.veg();
+                        break;
+                    case 2:
+                        M.non_veg();
+                        break;
+                    default:
+                        cout << "Please! Enter correct option..." << endl;
+                        break;
+                    }
+                }else{
+                    throw ch;
+                }
+            }catch(int ch){
+                cout<<ch<<" isn't a valid operation! Enter correct operation!..."<<endl;
+            }
+        }else{
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout<<"Invalid input! Please enter a number."<< endl;
+        }
+    }while(true);
+
+    return 0;
+}
